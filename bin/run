@@ -28,6 +28,10 @@ dh dh.pem
 keepalive 10 60
 persist-key
 persist-tun
+comp-lzo
+push "dhcp-option DNS 8.8.4.4"
+push "dhcp-option DNS 8.8.8.8"
+push "redirect-gateway def1"
 
 proto tcp-server
 port 443
@@ -46,6 +50,10 @@ dh dh.pem
 keepalive 10 60
 persist-key
 persist-tun
+comp-lzo
+push "dhcp-option DNS 8.8.4.4"
+push "dhcp-option DNS 8.8.8.8"
+push "redirect-gateway def1"
 
 proto udp
 port 1194
@@ -64,7 +72,7 @@ MY_IP_ADDR=$(curl -s http://myip.enix.org/REMOTE_ADDR)
 client
 nobind
 dev tun
-redirect-gateway def1
+comp-lzo
 
 <key>
 `cat key.pem`
@@ -86,6 +94,10 @@ remote $MY_IP_ADDR 1194 udp
 <connection>
 remote $MY_IP_ADDR 443 tcp-client
 </connection>
+
+# script-security 3 system
+# up /etc/openvpn/update-resolv-conf
+# down /etc/openvpn/update-resolv-conf
 EOF
 
 [ -f client.http ] || cat >client.http <<EOF
