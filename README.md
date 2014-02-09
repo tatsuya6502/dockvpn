@@ -2,9 +2,23 @@
 
 Quick instructions:
 
+## Build the Image
+
 ```bash
-CID=$(docker run -d -privileged -p 1194:1194/udp -p 443:443/tcp jpetazzo/openvpn)
-docker run -t -i -p 8080:8080 -volumes-from $CID jpetazzo/openvpn serveconfig
+# Don't know how to specify a branch in "docker build github.com/..." style.
+# So manually clone the repository and check the branch out.
+git clone https://github.com/tatsuya6502/dockvpn.git
+cd dockvpn/
+git checkout tatsuya6502
+
+docker build -t openvpn .
+```
+
+## Run It
+
+```bash
+CID=$(docker run -d -privileged -p 1194:1194/udp -p 443:443/tcp -t openvpn)
+docker run -t -i -p 8080:8080 -volumes-from $CID openvpn serveconfig
 ```
 
 Now download the file located at the indicated URL. You will get a
@@ -67,13 +81,13 @@ The topology used is `net30`, because it works on the widest range of OS.
 The TCP server uses `192.168.255.0/25` and the UDP server uses
 `192.168.255.128/25`.
 
-The client profile specifies `redirect-gateway def1`, meaning that after
-establishing the VPN connection, all traffic will go through the VPN.
-This might cause problems if you use local DNS recursors which are not
-directly reachable, since you will try to reach them through the VPN
-and they might not answer to you. If that happens, use public DNS
-resolvers like those of Google (8.8.4.4 and 8.8.8.8) or OpenDNS
-(208.67.222.222 and 208.67.220.220).
+The server profile specifies the followings:
+
+- `push "redirect-gateway def1"`, meaning that after a client
+  establishing the VPN connection, all traffic from the client will go
+  through the VPN.
+- `push "dhcp-option DNS 8.8.4.4"` and `push "dhcp-option DNS 8.8.8.8"`,
+  to make a client to use public DNS resolvers from Google.
 
 
 ## Security discussion
