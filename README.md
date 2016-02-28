@@ -17,8 +17,8 @@ docker build -t openvpn .
 ## Run It
 
 ```bash
-CID=$(docker run -d -privileged -p 1194:1194/udp -p 443:443/tcp -t openvpn)
-docker run -t -i -p 8080:8080 -volumes-from $CID openvpn serveconfig
+CID=$(docker run -d --privileged -p 1194:1194/udp -p 443:443/tcp -t openvpn)
+docker run -t -i -p 8080:8080 --volumes-from $CID openvpn serveconfig
 ```
 
 Now download the file located at the indicated URL. You will get a
