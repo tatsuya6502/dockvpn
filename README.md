@@ -5,19 +5,17 @@ Quick instructions:
 ## Build the Image
 
 ```bash
-# Don't know how to specify a branch in "docker build github.com/..." style.
-# So manually clone the repository and check the branch out.
 git clone https://github.com/tatsuya6502/dockvpn.git
 cd dockvpn/
 git checkout tatsuya6502
 
-docker build -t openvpn .
+docker build -t dockvpn .
 ```
 
 ## Run It
 
 ```bash
-CID=$(docker run -d --privileged -p 1194:1194/udp -p 443:443/tcp -t openvpn)
+CID=$(docker run -d --privileged -p 1194:1194/udp -p 443:443/tcp -t dockvpn)
 docker run -t -i -p 8080:8080 --volumes-from $CID openvpn serveconfig
 ```
 
@@ -41,7 +39,7 @@ it will show the download as "in progress" but it will remain stuck.
 You can download it with Firefox; or you can transfer it with another
 way: Dropbox, USB, micro-SD card...
 
-If you reboot the server (or stop the container), if you `docker run`
+If you reboot the server (or stop the container) and you `docker run`
 again, you will create a new service (with a new configuration) and
 you will have to re-download the configuration file. However, you can
 use `docker start` to restart the service without touching the configuration.
@@ -49,7 +47,7 @@ use `docker start` to restart the service without touching the configuration.
 
 ## How does it work?
 
-When the `jpetazzo/openvpn` image is started, it generates:
+When the `jpetazzo/dockvpn` image is started, it generates:
 
 - Diffie-Hellman parameters,
 - a private key,
@@ -62,8 +60,8 @@ on 443/tcp).
 
 The configuration is located in `/etc/openvpn`, and the Dockerfile
 declares that directory as a volume. It means that you can start another
-container with the `-volumes-from` flag, and access the configuration.
-Conveniently, `jpetazzo/openvpn` comes with a script called `serveconfig`,
+container with the `--volumes-from` flag, and access the configuration.
+Conveniently, `jpetazzo/dockvpn` comes with a script called `serveconfig`,
 which starts a pseudo HTTPS server on `8080/tcp`. The pseudo server
 does not even check the HTTP request; it just sends the HTTP status line,
 headers, and body right away.
