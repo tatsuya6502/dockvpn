@@ -16,7 +16,7 @@ docker build -t dockvpn .
 
 ```bash
 CID=$(docker run -d --privileged -p 1194:1194/udp -p 443:443/tcp -t dockvpn)
-docker run -t -i -p 8080:8080 --volumes-from $CID openvpn serveconfig
+docker run -t -i -p 8080:8080 --volumes-from $CID dockvpn serveconfig
 ```
 
 Now download the file located at the indicated URL. You will get a
@@ -29,6 +29,22 @@ The file can be used immediately as an OpenVPN profile. It embeds all the
 required configuration and credentials. It has been tested successfully on
 Linux, Windows, and Android clients. If you can test it on OS X and iPhone,
 let me know!
+
+**Note:** (2016-02-28) You will not be able to download the file from
+the `serverconfig` container with the following error:
+
+```
+Server has a weak ephemeral Diffie-Hellman public key
+```
+
+Then, stop the `serverconfig` container and copy the file from the
+container to the Docker host using the following command:
+
+```
+docker cp $CID:/etc/openvpn/client.ovpn .
+```
+
+and download it by scp.
 
 **Note:** there is a [bug in the Android Download Manager](
 http://code.google.com/p/android/issues/detail?id=3492) which prevents
